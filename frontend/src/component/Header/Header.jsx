@@ -1,70 +1,59 @@
+// src/component/Header/Header.jsx
 import React, { useState, useEffect } from 'react';
 import './Header.css';
 
 const Header = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-  // Array of nature/travel images from Unsplash
-  const images = [
-    'https://images.pexels.com/photos/16508230/pexels-photo-16508230.jpeg',
-    'https://images.pexels.com/photos/13391116/pexels-photo-13391116.jpeg',
-    'https://images.unsplash.com/photo-1566296314736-6eaac1ca0cb9?q=80&w=1528&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    'https://wallpapercat.com/w/full/d/2/6/639845-2560x1440-desktop-hd-sri-lanka-background-photo.jpg',
-    'https://images.unsplash.com/photo-1651264042769-ef84e30f4ac8?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c3JpbGFua2F8ZW58MHx8MHx8fDA%3D'
+
+  const foodImages = [
+    'https://images.pexels.com/photos/1639565/pexels-photo-1639565.jpeg',
+    'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop',
+    'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop'
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => 
-        prevIndex === images.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 5000); // Change every 5 seconds
-
+      setCurrentImageIndex((prev) => (prev + 1) % foodImages.length);
+    }, 3000);
     return () => clearInterval(interval);
-  }, [images.length]);
+  }, [foodImages.length]);
 
   return (
-    <header className="header">
+    <header className="home-header">
+      <div className="header-overlay"></div>
+      
+      {/* Animated Background Pattern */}
+      <div className="header-bg-pattern">
+        <div className="floating-circle floating-circle-1"></div>
+        <div className="floating-circle floating-circle-2"></div>
+        <div className="floating-circle floating-circle-3"></div>
+      </div>
+
       <div className="header-content">
-        <nav className="navbar">
-          <div className="logo">
-            <h1>Wanderlust</h1>
-          </div>
-          <ul className="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#destinations">Destinations</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
-        </nav>
-        
-        <div className="hero-section">
-          <div className="hero-text">
-            <h2>Discover Nature's Beauty</h2>
-            <p>Explore breathtaking landscapes and create unforgettable memories</p>
-            <button className="cta-button">Start Your Journey</button>
+        <div className="header-text">
+          <h1 className="main-title">
+            Delicious <span className="title-highlight">Food Hub</span>
+          </h1>
+          <p className="header-subtitle">
+            Discover amazing recipes and culinary adventures
+          </p>
+          <button className="cta-button">Start Cooking</button>
+        </div>
+
+        {/* Shaking Food Photos */}
+        <div className="food-gallery-header">
+          <div className="food-grid">
+            {foodImages.slice(0, 4).map((image, index) => (
+              <div key={index} className={`food-item shake-${index + 1}`}>
+                <img src={image} alt={`Food ${index + 1}`} />
+                <div className="food-item-overlay"></div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-      
-      <div className="image-slider">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className={`slide ${index === currentImageIndex ? 'active' : ''}`}
-            style={{ backgroundImage: `url(${image})` }}
-          />
-        ))}
-      </div>
-      
-      <div className="image-indicators">
-        {images.map((_, index) => (
-          <span
-            key={index}
-            className={`indicator ${index === currentImageIndex ? 'active' : ''}`}
-            onClick={() => setCurrentImageIndex(index)}
-          />
-        ))}
       </div>
     </header>
   );

@@ -3,10 +3,15 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './component/Navbar/Navbar';
 import Home from './component/Home/Home';
-import Destination from './component/Destinations/Destination';
 import SignIn from './component/Account/SignIn';
 import SignUp from './component/Account/SignUp';
-import Gallery from './component/Gallery/Gallery';
+import Order from './component/Order/Order';
+import OrderConfirmation from './component/OrderConfirmation/OrderConfirmation';
+import Recipe from './component/Recipe/Recipe';
+import Review from './component/Review/Review';
+import PaymentForm from './component/PaymentForm/PaymentForm';
+
+
 
 const App = () => {
   return (
@@ -14,10 +19,15 @@ const App = () => {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/destinations" element={<Destination />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/order" element={<Order />} />
+        <Route path="/payment" element={<PaymentForm />} />
+        <Route path="/order-confirmation" element={<OrderConfirmation />} /> 
+        <Route path="/recipe" element={<Recipe />} />  
+        <Route path="/review" element={<Review />} />  
+
+
       </Routes>
     </>
   );

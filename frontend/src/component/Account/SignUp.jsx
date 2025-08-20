@@ -1,89 +1,178 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './SignUp.css';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation  } from "react-router-dom";
+import "./SignUp.css";
 
 const SignUp = () => {
-  const navigate = useNavigate();
+  const location = useLocation();
+  const [infoMessage, setInfoMessage] = useState('');
+  const [toast, setToast] = useState({ show: false, message: '', type: '' }); // MOVED INSIDE COMPONENT
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    agreeTerms: false,
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    agreeToTerms: false,
   });
+  const [errors, setErrors] = useState({}); // MOVED ABOVE handleSubmit
+  const [isLoading, setIsLoading] = useState(false); // MOVED ABOVE handleSubmit
+  const [passwordStrength, setPasswordStrength] = useState(0); // MOVED ABOVE handleSubmit
 
-  const [passwordStrength, setPasswordStrength] = useState(0);
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast({ show: false, message: '', type: '' });
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show]);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      window.scrollTo(0, 0);
+      setInfoMessage(location.state.message);
+
+      // Optionally clear message after some time
+      const timer = setTimeout(() => setInfoMessage(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
-
-    if (name === 'password') {
-      calculatePasswordStrength(value);
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    if (name === "password") setPasswordStrength(calculatePasswordStrength(value));
   };
 
   const calculatePasswordStrength = (password) => {
     let strength = 0;
-    if (password.length >= 8) strength += 25;
-    if (/[A-Z]/.test(password)) strength += 25;
-    if (/[0-9]/.test(password)) strength += 25;
-    if (/[^A-Za-z0-9]/.test(password)) strength += 25;
-    setPasswordStrength(strength);
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    return strength;
   };
 
-  const getPasswordStrengthColor = () => {
-    if (passwordStrength < 25) return '#ff4757'; // red
-    if (passwordStrength < 50) return '#ffa502'; // orange
-    if (passwordStrength < 75) return '#ffb142'; // yellow/orange
-    return '#2ed573'; // green
+  const getPasswordStrengthText = (strength) => {
+    const levels = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
+    return levels[strength] || "Very Weak";
   };
 
-  const getPasswordStrengthText = () => {
-    if (passwordStrength < 25) return 'Weak';
-    if (passwordStrength < 50) return 'Fair';
-    if (passwordStrength < 75) return 'Good';
-    return 'Strong';
+  const getPasswordStrengthColor = (strength) => {
+    const colors = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#10b981"];
+    return colors[strength] || "#ef4444";
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const validateForm = () => {
+  const newErrors = {};
+  let firstErrorMessage = '';
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!', {
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      return;
-    }
-    if (!formData.agreeTerms) {
-      toast.warning('Please agree to the terms and conditions!', {
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      return;
-    }
+  // First Name validation
+  if (!formData.firstName.trim()) {
+    newErrors.firstName = "First name is required";
+    if (!firstErrorMessage) firstErrorMessage = "Please enter your first name";
+  } else if (formData.firstName.trim().length < 2) {
+    newErrors.firstName = "First name must be at least 2 characters";
+    if (!firstErrorMessage) firstErrorMessage = "First name is too short";
+  } else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim())) {
+    newErrors.firstName = "First name can only contain letters";
+    if (!firstErrorMessage) firstErrorMessage = "First name contains invalid characters";
+  }
 
+  // Last Name validation
+  if (!formData.lastName.trim()) {
+    newErrors.lastName = "Last name is required";
+    if (!firstErrorMessage) firstErrorMessage = "Please enter your last name";
+  } else if (formData.lastName.trim().length < 2) {
+    newErrors.lastName = "Last name must be at least 2 characters";
+    if (!firstErrorMessage) firstErrorMessage = "Last name is too short";
+  } else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim())) {
+    newErrors.lastName = "Last name can only contain letters";
+    if (!firstErrorMessage) firstErrorMessage = "Last name contains invalid characters";
+  }
+
+  // Email validation
+  if (!formData.email) {
+    newErrors.email = "Email is required";
+    if (!firstErrorMessage) firstErrorMessage = "Please enter your email address";
+  } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    newErrors.email = "Please enter a valid email";
+    if (!firstErrorMessage) firstErrorMessage = "Please enter a valid email address";
+  } else if (formData.email.length > 100) {
+    newErrors.email = "Email is too long";
+    if (!firstErrorMessage) firstErrorMessage = "Email address is too long";
+  }
+
+  // Password validation
+  if (!formData.password) {
+    newErrors.password = "Password is required";
+    if (!firstErrorMessage) firstErrorMessage = "Please create a password";
+  } else if (formData.password.length < 8) {
+    newErrors.password = "Password must be at least 8 characters";
+    if (!firstErrorMessage) firstErrorMessage = "Password is too short (minimum 8 characters)";
+  } else if (formData.password.length > 50) {
+    newErrors.password = "Password is too long";
+    if (!firstErrorMessage) firstErrorMessage = "Password is too long (maximum 50 characters)";
+  } else if (!/(?=.*[a-z])/.test(formData.password)) {
+    newErrors.password = "Password must contain at least one lowercase letter";
+    if (!firstErrorMessage) firstErrorMessage = "Password needs a lowercase letter";
+  } else if (!/(?=.*[A-Z])/.test(formData.password)) {
+    newErrors.password = "Password must contain at least one uppercase letter";
+    if (!firstErrorMessage) firstErrorMessage = "Password needs an uppercase letter";
+  } else if (!/(?=.*\d)/.test(formData.password)) {
+    newErrors.password = "Password must contain at least one number";
+    if (!firstErrorMessage) firstErrorMessage = "Password needs at least one number";
+  } else if (!/(?=.*[@$!%*?&])/.test(formData.password)) {
+    newErrors.password = "Password must contain at least one special character (@$!%*?&)";
+    if (!firstErrorMessage) firstErrorMessage = "Password needs a special character";
+  }
+
+  // Confirm Password validation
+  if (!formData.confirmPassword) {
+    newErrors.confirmPassword = "Please confirm your password";
+    if (!firstErrorMessage) firstErrorMessage = "Please confirm your password";
+  } else if (formData.password !== formData.confirmPassword) {
+    newErrors.confirmPassword = "Passwords do not match";
+    if (!firstErrorMessage) firstErrorMessage = "Passwords don't match";
+  }
+
+  // Terms agreement validation
+  if (!formData.agreeToTerms) {
+    newErrors.agreeToTerms = "You must agree to the terms and conditions";
+    if (!firstErrorMessage) firstErrorMessage = "Please accept the terms and conditions";
+  }
+
+  // Show toast message for validation errors
+  if (Object.keys(newErrors).length > 0 && firstErrorMessage) {
+    setToast({
+      show: true,
+      message: `❌ ${firstErrorMessage}`,
+      type: 'error'
+    });
+  }
+
+  return newErrors;
+};
+
+// Updated handleSubmit function to work with enhanced validation
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const newErrors = validateForm();
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+    setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/users/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:4000/api/users/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -92,262 +181,214 @@ const SignUp = () => {
         }),
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.success('Account created successfully!', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          onClose: () => navigate('/signin')
-        });
-        setFormData({
-          firstName: '',
-          lastName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          agreeTerms: false,
-        });
-        setPasswordStrength(0);
-      } else {
-        toast.error(result.message || 'Registration failed!', {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Error ${response.status}`);
       }
-    } catch (error) {
-      console.error('Error during registration:', error);
-      toast.error('Server error, please try again later.', {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
+
+      const data = await response.json();
+      setToast({
+        show: true,
+        message: data.message || "Account created successfully! Welcome to FoodApp! 🎉",
+        type: 'success'
       });
+      
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        agreeToTerms: false,
+      });
+    } catch (error) {
+      console.error("Sign up error:", error);
+
+      setToast({
+        show: true,
+        message: error.message || "Something went wrong. Please try again later.",
+        type: 'error'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="signup-page">
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+    <div className="signup-container">
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`toast toast-${toast.type}`}>
+          <div className="toast-content">
+            <span className="toast-icon">
+              {toast.type === 'success' ? '✅' : '❌'}
+            </span>
+            <span className="toast-message">{toast.message}</span>
+            <button 
+              className="toast-close" 
+              onClick={() => setToast({ show: false, message: '', type: '' })}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
       
-      <div className="signup-container">
-        <div className="signup-background">
-          <div className="floating-elements" aria-hidden="true">
-            <div className="floating-element passport">📘</div>
-            <div className="floating-element camera">📷</div>
-            <div className="floating-element luggage">🧳</div>
-            <div className="floating-element globe">🌐</div>
-            <div className="floating-element ticket">🎫</div>
+      <div className="signup-form-wrapper">
+        {infoMessage && (
+          <div className="info-message" style={{ color: 'red', marginBottom: '1rem' }}>
+            {infoMessage}
+          </div>
+        )}
+        
+        <Link to="/" className="back-link">←</Link>
+
+        <div className="signup-header">
+          <div className="logo-wrapper">
+            <span className="logo-emoji">🍽️</span>
+            <h1 className="app-title">FoodApp</h1>
+          </div>
+          <h2 className="heading">Join Our Community!</h2>
+          <p className="subheading">Sign up now to order your favorite foods and enjoy delicious recipes from around the world!</p>
+        </div>
+
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="name-fields">
+            <div className="input-group">
+              <label htmlFor="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Enter first name"
+                className={errors.firstName ? 'input-error' : ''}
+              />
+              {errors.firstName && <span className="error-text">{errors.firstName}</span>}
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Enter last name"
+                className={errors.lastName ? 'input-error' : ''}
+              />
+              {errors.lastName && <span className="error-text">{errors.lastName}</span>}
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              className={errors.email ? 'input-error' : ''}
+            />
+            {errors.email && <span className="error-text">{errors.email}</span>}
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Create a strong password"
+              className={errors.password ? 'input-error' : ''}
+            />
+            {formData.password && (
+              <div className="password-strength">
+                <div className="strength-bar-background">
+                  <div
+                    className="strength-bar-fill"
+                    style={{
+                      width: `${(passwordStrength / 5) * 100}%`,
+                      backgroundColor: getPasswordStrengthColor(passwordStrength),
+                    }}
+                  ></div>
+                </div>
+                <span
+                  className="strength-text"
+                  style={{ color: getPasswordStrengthColor(passwordStrength) }}
+                >
+                  {getPasswordStrengthText(passwordStrength)}
+                </span>
+              </div>
+            )}
+            {errors.password && <span className="error-text">{errors.password}</span>}
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm your password"
+              className={errors.confirmPassword ? 'input-error' : ''}
+            />
+            {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
+          </div>
+
+          <div className="checkbox-group">
+            <label htmlFor="agreeToTerms">
+              <input
+                type="checkbox"
+                id="agreeToTerms"
+                name="agreeToTerms"
+                checked={formData.agreeToTerms}
+                onChange={handleChange}
+              />
+              I agree to the <span className="link-text">Terms of Service</span> and{' '}
+              <span className="link-text">Privacy Policy</span>
+            </label>
+            {errors.agreeToTerms && <span className="error-text">{errors.agreeToTerms}</span>}
+          </div>
+
+          <button type="submit" disabled={isLoading} className="submit-button">
+            {isLoading ? (
+              <>
+                <div className="spinner"></div> Creating Account...
+              </>
+            ) : (
+              'Create Account'
+            )}
+          </button>
+        </form>
+
+        <div className="divider-wrapper">
+          <div className="divider-line">
+            <span className="divider-text">or</span>
           </div>
         </div>
 
-        <div className="signup-form-container">
-          <header className="signup-header">
-            <div className="logo" aria-label="Wanderlust logo">
-              <span className="logo-icon" role="img" aria-hidden="false">🌍</span>
-              <span className="logo-text">Wanderlust</span>
-            </div>
-            <h2 className="signup-title">Start Your Journey</h2>
-            <p className="signup-subtitle">Create your account to explore the world</p>
-          </header>
+        <div className="social-buttons">
+          <button className="social-btn google-btn">
+            <span className="social-icon">G</span> Google
+          </button>
+          <button className="social-btn facebook-btn">
+            <span className="social-icon facebook-icon">f</span> Facebook
+          </button>
+        </div>
 
-          <form className="signup-form" onSubmit={handleSubmit} noValidate>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="firstName" className="sr-only">First Name</label>
-                <div className="input-wrapper">
-                  <input
-                    id="firstName"
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    placeholder="First Name"
-                    className="form-input"
-                    required
-                    autoComplete="given-name"
-                  />
-                  <span className="input-icon" aria-hidden="true">👤</span>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="lastName" className="sr-only">Last Name</label>
-                <div className="input-wrapper">
-                  <input
-                    id="lastName"
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    placeholder="Last Name"
-                    className="form-input"
-                    required
-                    autoComplete="family-name"
-                  />
-                  <span className="input-icon" aria-hidden="true">👤</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email" className="sr-only">Email</label>
-              <div className="input-wrapper">
-                <input
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  className="form-input"
-                  required
-                  autoComplete="email"
-                />
-                <span className="input-icon" aria-hidden="true">📧</span>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="password" className="sr-only">Create password</label>
-              <div className="input-wrapper">
-                <input
-                  id="password"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Create password"
-                  className="form-input"
-                  required
-                  autoComplete="new-password"
-                />
-                <span className="input-icon" aria-hidden="true">🔒</span>
-              </div>
-              {formData.password && (
-                <div className="password-strength" aria-live="polite">
-                  <div className="strength-bar" aria-hidden="true">
-                    <div
-                      className="strength-fill"
-                      style={{
-                        width: `${passwordStrength}%`,
-                        backgroundColor: getPasswordStrengthColor(),
-                      }}
-                    />
-                  </div>
-                  <span
-                    className="strength-text"
-                    style={{ color: getPasswordStrengthColor() }}
-                  >
-                    {getPasswordStrengthText()}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="confirmPassword" className="sr-only">Confirm password</label>
-              <div className="input-wrapper">
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm password"
-                  className="form-input"
-                  required
-                  autoComplete="new-password"
-                />
-                <span className="input-icon" aria-hidden="true">🔒</span>
-                {formData.confirmPassword && (
-                  <span
-                    className={`validation-icon ${
-                      formData.password === formData.confirmPassword ? 'match' : 'no-match'
-                    }`}
-                    role="img"
-                    aria-label={
-                      formData.password === formData.confirmPassword
-                        ? 'Passwords match'
-                        : 'Passwords do not match'
-                    }
-                  >
-                    {formData.password === formData.confirmPassword ? '✓' : '✗'}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="form-options">
-              <label className="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  name="agreeTerms"
-                  checked={formData.agreeTerms}
-                  onChange={handleChange}
-                  required
-                />
-                <span className="checkmark"></span>
-                I agree to the{' '}
-                <a href="#" className="terms-link" tabIndex={0}>
-                  Terms & Conditions
-                </a>
-              </label>
-            </div>
-
-            <button type="submit" className="signup-button">
-              <span>Create Account</span>
-              <div className="button-ripple"></div>
-            </button>
-          </form>
-
-          <footer className="signup-footer">
-            <p>
-              Already have an account?{' '}
-              <a href="/signin" className="signin-link">
-                Sign in here
-              </a>
-            </p>
-
-            <div className="divider" aria-hidden="true">
-              <span>or sign up with</span>
-            </div>
-
-            <div className="social-buttons">
-              <button type="button" className="social-button google">
-                <span className="social-icon" role="img" aria-label="Google">🔍</span>
-                Google
-              </button>
-              <button type="button" className="social-button facebook">
-                <span className="social-icon" role="img" aria-label="Facebook">📘</span>
-                Facebook
-              </button>
-            </div>
-          </footer>
+        <div className="signin-link-wrapper">
+          <p>
+            Already have an account? <Link to="/signin" className="signin-link">Sign In</Link>
+          </p>
         </div>
       </div>
     </div>

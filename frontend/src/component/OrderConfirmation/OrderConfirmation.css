@@ -1,0 +1,401 @@
+.confirmation-container {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding-top: 100px;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .toast-container {
+          position: fixed;
+          top: 20px;
+          left: 20px;
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-width: 400px;
+        }
+
+        .toast {
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          overflow: hidden;
+          animation: slideIn 0.3s ease-out;
+          border-left: 4px solid;
+        }
+
+        .toast-success {
+          border-left-color: #10b981;
+        }
+
+        .toast-error {
+          border-left-color: #ef4444;
+        }
+
+        .toast-info {
+          border-left-color: #3b82f6;
+        }
+
+        .toast-content {
+          display: flex;
+          align-items: center;
+          padding: 16px;
+          gap: 12px;
+        }
+
+        .toast-icon {
+          font-weight: bold;
+          font-size: 16px;
+        }
+
+        .toast-success .toast-icon {
+          color: #10b981;
+        }
+
+        .toast-error .toast-icon {
+          color: #ef4444;
+        }
+
+        .toast-info .toast-icon {
+          color: #3b82f6;
+        }
+
+        .toast-message {
+          flex: 1;
+          font-size: 14px;
+          color: #374151;
+          line-height: 1.4;
+        }
+
+        .toast-close {
+          background: none;
+          border: none;
+          font-size: 20px;
+          color: #6b7280;
+          cursor: pointer;
+          padding: 0;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 4px;
+          transition: background-color 0.2s;
+        }
+
+        .toast-close:hover {
+          background-color: #f3f4f6;
+        }
+
+        @keyframes slideIn {
+          from {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        .confirmation-card {
+          max-width: 600px;
+          width: 100%;
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+        }
+
+        .confirmation-header {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          color: white;
+          padding: 40px;
+          text-align: center;
+          position: relative;
+        }
+
+        .success-animation {
+          margin-bottom: 20px;
+        }
+
+        .checkmark {
+          display: inline-block;
+          width: 80px;
+          height: 80px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 40px;
+          font-weight: bold;
+          margin: 0 auto 20px;
+          animation: checkmarkBounce 0.6s ease-in-out;
+        }
+
+        @keyframes checkmarkBounce {
+          0%, 20% {
+            transform: scale(0);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          80% {
+            transform: scale(0.9);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+
+        .confirmation-header h1 {
+          font-size: 32px;
+          font-weight: 600;
+          margin: 0 0 10px 0;
+        }
+
+        .confirmation-header p {
+          font-size: 18px;
+          opacity: 0.9;
+          margin: 0;
+        }
+
+        .confirmation-details {
+          padding: 40px;
+        }
+
+        .confirmation-details h2 {
+          color: #1f2937;
+          font-size: 24px;
+          font-weight: 600;
+          margin: 0 0 30px 0;
+          border-bottom: 2px solid #e2e8f0;
+          padding-bottom: 15px;
+        }
+
+        .confirmation-details h3 {
+          color: #374151;
+          font-size: 18px;
+          font-weight: 600;
+          margin: 30px 0 15px 0;
+        }
+
+        .item-info {
+          display: flex;
+          gap: 20px;
+          background: #f8fafc;
+          padding: 20px;
+          border-radius: 12px;
+          margin-bottom: 30px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .item-image {
+          width: 100px;
+          height: 80px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 2px solid #e2e8f0;
+        }
+
+        .item-details {
+          flex: 1;
+        }
+
+        .item-details h3 {
+          margin: 0 0 10px 0;
+          color: #1f2937;
+          font-size: 18px;
+        }
+
+        .item-details p {
+          margin: 5px 0;
+          color: #6b7280;
+          font-size: 14px;
+        }
+
+        .item-details .price {
+          color: #10b981;
+          font-weight: 600;
+          font-size: 16px;
+        }
+
+        .delivery-info {
+          background: #f8fafc;
+          padding: 20px;
+          border-radius: 12px;
+          margin-bottom: 30px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .info-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 12px;
+          gap: 15px;
+        }
+
+        .info-item:last-child {
+          margin-bottom: 0;
+        }
+
+        .info-label {
+          font-weight: 600;
+          color: #374151;
+          min-width: 120px;
+          flex-shrink: 0;
+        }
+
+        .info-value {
+          color: #6b7280;
+          text-align: right;
+          flex: 1;
+          word-break: break-word;
+        }
+
+        .total-section {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 25px;
+          border-radius: 12px;
+          text-align: center;
+        }
+
+        .total-section h3 {
+          margin: 0 0 15px 0;
+          font-size: 18px;
+          opacity: 0.9;
+        }
+
+        .total-price {
+          font-size: 28px;
+          font-weight: 700;
+          margin: 0;
+        }
+
+        .confirmation-footer {
+          background: #f8fafc;
+          padding: 30px 40px;
+          border-top: 1px solid #e2e8f0;
+        }
+
+        .confirmation-info {
+          margin-bottom: 25px;
+        }
+
+        .confirmation-info p {
+          margin: 8px 0;
+          color: #6b7280;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .back-to-menu {
+          width: 100%;
+          padding: 16px 24px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .back-to-menu:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .loading {
+          color: white;
+          text-align: center;
+          font-size: 18px;
+          padding: 50px;
+        }
+
+        @media (max-width: 768px) {
+          .confirmation-container {
+            padding: 10px;
+          }
+
+          .confirmation-card {
+            margin: 10px;
+          }
+
+          .confirmation-header {
+            padding: 30px 20px;
+          }
+
+          .confirmation-header h1 {
+            font-size: 24px;
+          }
+
+          .confirmation-details {
+            padding: 20px;
+          }
+
+          .confirmation-footer {
+            padding: 20px;
+          }
+
+          .item-info {
+            flex-direction: column;
+            gap: 15px;
+          }
+
+          .item-image {
+            width: 100%;
+            height: 150px;
+            align-self: center;
+          }
+
+          .info-item {
+            flex-direction: column;
+            gap: 5px;
+            align-items: flex-start;
+          }
+
+          .info-label {
+            min-width: auto;
+          }
+
+          .info-value {
+            text-align: left;
+          }
+
+          .toast-container {
+            left: 10px;
+            right: 10px;
+            max-width: none;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .checkmark {
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+          }
+
+          .confirmation-header h1 {
+            font-size: 20px;
+          }
+
+          .confirmation-header p {
+            font-size: 16px;
+          }
+
+          .total-price {
+            font-size: 24px;
+          }
+        }

@@ -1,0 +1,368 @@
+.order-page {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding-top: 100px;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .toast-container {
+          position: fixed;
+          top: 20px;
+          left: 20px;
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-width: 400px;
+        }
+
+        .toast {
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          overflow: hidden;
+          animation: slideIn 0.3s ease-out;
+          border-left: 4px solid;
+        }
+
+        .toast-success {
+          border-left-color: #10b981;
+        }
+
+        .toast-error {
+          border-left-color: #ef4444;
+        }
+
+        .toast-info {
+          border-left-color: #3b82f6;
+        }
+
+        .toast-content {
+          display: flex;
+          align-items: center;
+          padding: 16px;
+          gap: 12px;
+        }
+
+        .toast-icon {
+          font-weight: bold;
+          font-size: 16px;
+        }
+
+        .toast-success .toast-icon {
+          color: #10b981;
+        }
+
+        .toast-error .toast-icon {
+          color: #ef4444;
+        }
+
+        .toast-info .toast-icon {
+          color: #3b82f6;
+        }
+
+        .toast-message {
+          flex: 1;
+          font-size: 14px;
+          color: #374151;
+          line-height: 1.4;
+        }
+
+        .toast-close {
+          background: none;
+          border: none;
+          font-size: 20px;
+          color: #6b7280;
+          cursor: pointer;
+          padding: 0;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 4px;
+          transition: background-color 0.2s;
+        }
+
+        .toast-close:hover {
+          background-color: #f3f4f6;
+        }
+
+        @keyframes slideIn {
+          from {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+
+        .order-container {
+          max-width: 800px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+        }
+
+        .order-container h2 {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          margin: 0;
+          padding: 30px 40px;
+          font-size: 28px;
+          font-weight: 600;
+          text-align: center;
+        }
+
+        .order-content {
+          padding: 40px;
+        }
+
+        .item-info {
+          display: flex;
+          gap: 20px;
+          background: #f8fafc;
+          padding: 25px;
+          border-radius: 12px;
+          margin-bottom: 40px;
+          border: 1px solid #e2e8f0;
+          align-items: center;
+        }
+
+        .item-image {
+          width: 120px;
+          height: 100px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 2px solid #e2e8f0;
+        }
+
+        .item-details h3 {
+          margin: 0 0 10px 0;
+          color: #1f2937;
+          font-size: 24px;
+          font-weight: 600;
+        }
+
+        .item-details .price {
+          color: #10b981;
+          font-size: 20px;
+          font-weight: 700;
+          margin: 0;
+        }
+
+        .order-form {
+          display: grid;
+          gap: 25px;
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .form-label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #374151;
+          font-size: 14px;
+        }
+
+        .form-input {
+          padding: 14px 16px;
+          border: 2px solid #e2e8f0;
+          border-radius: 8px;
+          font-size: 16px;
+          transition: all 0.2s;
+          background: white;
+          font-family: inherit;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .form-input:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-input.error {
+          border-color: #ef4444;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .form-textarea {
+          resize: vertical;
+          min-height: 80px;
+          font-family: inherit;
+        }
+
+        .quantity-input {
+          max-width: 120px;
+        }
+
+        .error-message {
+          display: block;
+          color: #ef4444;
+          font-size: 12px;
+          margin-top: 6px;
+          font-weight: 500;
+          line-height: 1.4;
+        }
+
+        .order-summary {
+          background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+          padding: 30px;
+          border-radius: 12px;
+          border: 1px solid #e2e8f0;
+          margin-top: 20px;
+        }
+
+        .total-price {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 25px;
+          font-size: 18px;
+          font-weight: 600;
+          color: #1f2937;
+          padding-bottom: 15px;
+          border-bottom: 2px solid #e2e8f0;
+        }
+
+        .price-amount {
+          color: #10b981;
+          font-size: 24px;
+          font-weight: 700;
+        }
+
+        .submit-btn {
+          width: 100%;
+          padding: 16px 24px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .submit-btn.loading {
+          color: transparent;
+        }
+
+        .submit-btn.loading::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 20px;
+          height: 20px;
+          margin: -10px 0 0 -10px;
+          border: 2px solid transparent;
+          border-top: 2px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+          .order-page {
+            padding: 10px;
+          }
+
+          .order-container {
+            margin: 10px;
+            border-radius: 12px;
+          }
+
+          .order-container h2 {
+            padding: 20px;
+            font-size: 24px;
+          }
+
+          .order-content {
+            padding: 20px;
+          }
+
+          .item-info {
+            flex-direction: column;
+            text-align: center;
+            gap: 15px;
+          }
+
+          .item-image {
+            width: 100%;
+            max-width: 200px;
+            height: 150px;
+          }
+
+          .item-details h3 {
+            font-size: 20px;
+          }
+
+          .item-details .price {
+            font-size: 18px;
+          }
+
+          .order-summary {
+            padding: 20px;
+          }
+
+          .total-price {
+            font-size: 16px;
+          }
+
+          .price-amount {
+            font-size: 20px;
+          }
+
+          .toast-container {
+            left: 10px;
+            right: 10px;
+            max-width: none;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .order-container h2 {
+            font-size: 20px;
+            padding: 15px;
+          }
+
+          .order-content {
+            padding: 15px;
+          }
+
+          .form-input {
+            padding: 12px 14px;
+            font-size: 14px;
+          }
+
+          .order-summary {
+            padding: 15px;
+          }
+        }

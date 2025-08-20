@@ -1,164 +1,305 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './SignIn.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./SignIn.css";
+
+
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const [toast, setToast] = useState({ show: false, message: '', type: '' });
+
+
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
 
-  // 🔁 Redirect to home if already logged in
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      navigate('/');
+  if (toast.show) {
+    const timer = setTimeout(() => {
+      setToast({ show: false, message: '', type: '' });
+    }, 4000);
+    return () => clearTimeout(timer);
+  }
+}, [toast.show]);
+  // Check if user already logged in on component mount
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      setIsLoggedIn(true);
     }
-  }, [navigate]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+    if (serverError) setServerError("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const validateForm = () => {
+  const newErrors = {};
+  let firstErrorMessage = '';
+
+  if (!formData.email) {
+    newErrors.email = "Email is required";
+    if (!firstErrorMessage) firstErrorMessage = "Please enter your email address";
+  } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    newErrors.email = "Please enter a valid email";
+    if (!firstErrorMessage) firstErrorMessage = "Please enter a valid email address";
+  }
+
+  if (!formData.password) {
+    newErrors.password = "Password is required";
+    if (!firstErrorMessage) firstErrorMessage = "Please enter your password";
+  } else if (formData.password.length < 6) {
+    newErrors.password = "Password must be at least 6 characters";
+    if (!firstErrorMessage) firstErrorMessage = "Password is too short (minimum 6 characters)";
+  }
+
+  // Show toast message for validation errors
+  if (Object.keys(newErrors).length > 0 && firstErrorMessage) {
+    setToast({
+      show: true,
+      message: `❌ ${firstErrorMessage}`,
+      type: 'error'
+    });
+  }
+
+  return newErrors;
+};
+
+// 4. Update handleSubmit function - replace the try-catch block
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const newErrors = validateForm();
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+    setIsLoading(true);
+    setServerError("");
 
     try {
-      const response = await fetch('http://localhost:4000/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("http://localhost:4000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (response.ok) {
-        // ✅ Store login status
-        localStorage.setItem('isLoggedIn', 'true');
-
-        toast.success('Login successful!', {
-          position: "top-right",
-          autoClose: 3000,
-        });
-
-        navigate('/'); // Go to home
-      } else {
-        toast.error(data.message || 'Invalid email or password', {
-          position: "top-right",
-          autoClose: 4000,
-        });
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Server error. Please try again later.', {
-        position: "top-right",
-        autoClose: 5000,
+       if (!res.ok) {
+      const errorMsg = data.message || "Username or password incorrect";
+      setServerError(errorMsg);
+      setToast({
+        show: true,
+        message: `❌ ${errorMsg}`,
+        type: 'error'
       });
+    } else {
+      console.log("Login success:", data);
+      localStorage.setItem("userId", data.userId);
+      setIsLoggedIn(true);
+      
+      // Show success toast
+      setToast({
+        show: true,
+        message: "🎉 Welcome back! Login successful",
+        type: 'success'
+      });
+      
+      // Redirect after a short delay to show the toast
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
     }
-  };
+  } catch (error) {
+    const errorMsg = "Server error. Please try again later.";
+    setServerError(errorMsg);
+    setToast({
+      show: true,
+      message: `❌ ${errorMsg}`,
+      type: 'error'
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    setIsLoggedIn(false);
+    setFormData({
+      email: "",
+      password: "",
+      rememberMe: false,
+    });
+    setServerError("");
+    setToast({
+    show: true,
+    message: "👋 You have been logged out successfully",
+    type: 'success'
+  });
+};
+  
+
+ if (isLoggedIn) {
   return (
     <div className="signin-container">
-      <ToastContainer />
+      {toast.show && (
+        <div className={`toast toast-${toast.type}`}>
+          <div className="toast-content">
+            <span className="toast-icon">
+              {toast.type === 'success' ? '✅' : '❌'}
+            </span>
+            <span className="toast-message">{toast.message}</span>
+            <button
+              className="toast-close"
+              onClick={() => setToast({ show: false, message: '', type: '' })}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
 
-      <div className="signin-background">
-        <div className="floating-elements">
-          <div className="floating-element plane">✈</div>
-          <div className="floating-element compass">🧭</div>
-          <div className="floating-element mountain">🏔</div>
-          <div className="floating-element palm">🌴</div>
+      <div className="signin-card">
+        <h2>You are already logged in</h2>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+  return (
+  <div className="signin-container">
+      {/* Add Toast here */}
+    {toast.show && (
+      <div className={`toast toast-${toast.type}`}>
+        <div className="toast-content">
+          <span className="toast-icon">
+            {toast.type === 'success' ? '✅' : '❌'}
+          </span>
+          <span className="toast-message">{toast.message}</span>
+          <button 
+            className="toast-close" 
+            onClick={() => setToast({ show: false, message: '', type: '' })}
+          >
+            ×
+          </button>
         </div>
       </div>
-
-      <div className="signin-form-container">
+    )}
+      <div className="signin-card">
         <div className="signin-header">
           <div className="logo">
-            <span className="logo-icon">🌍</span>
-            <span className="logo-text">Wanderlust</span>
+            <span className="logo-icon">🍽️</span>
+            <h1>FoodApp</h1>
           </div>
-          <h2 className="signin-title">Welcome Back</h2>
-          <p className="signin-subtitle">Continue your journey with us</p>
+          <h2>Welcome Back!</h2>
+          <p>Sign in to your account to continue your culinary journey</p>
         </div>
 
-        <form className="signin-form" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="signin-form">
           <div className="form-group">
-            <div className="input-wrapper">
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-                className="form-input"
-                required
-              />
-              <span className="input-icon">📧</span>
-            </div>
+            <label htmlFor="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className={errors.email ? "error" : ""}
+              placeholder="Enter your email"
+            />
+            {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
 
           <div className="form-group">
-            <div className="input-wrapper">
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                className="form-input"
-                required
-              />
-              <span className="input-icon">🔒</span>
-            </div>
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={errors.password ? "error" : ""}
+              placeholder="Enter your password"
+            />
+            {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
+
+          {serverError && <p className="error-message">{serverError}</p>}
 
           <div className="form-options">
-            <label className="checkbox-wrapper">
-              <input
-                type="checkbox"
-                name="rememberMe"
-                checked={formData.rememberMe}
-                onChange={handleChange}
-              />
-              <span className="checkmark"></span>
-              Remember me
-            </label>
-            <a href="#" className="forgot-password">Forgot password?</a>
+            <label className="checkbox-label">
+  <input
+    type="checkbox"
+    name="rememberMe"
+    checked={formData.rememberMe}
+    onChange={handleChange}
+    className="checkbox-input"  // Add this class
+  />
+  <span className="checkmark"></span>
+  Remember me
+</label>
+            <a href="#forgot" className="forgot-link">
+              Forgot Password?
+            </a>
           </div>
 
-          <button type="submit" className="signin-button">
-            <span>Sign In</span>
-            <div className="button-ripple"></div>
+          <button type="submit" className="signin-btn" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <span className="spinner"></span>
+                Signing In...
+              </>
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
+        <div className="divider">
+          <span>or</span>
+        </div>
+
+        <div className="social-signin">
+          <button className="social-btn google">
+            <span className="social-icon">G</span>
+            Continue with Google
+          </button>
+          <button className="social-btn facebook">
+            <span className="social-icon">f</span>
+            Continue with Facebook
+          </button>
+        </div>
+
         <div className="signin-footer">
-          <p>Don't have an account? <a href="/signup" className="signup-link">Sign up now</a></p>
-
-          <div className="divider">
-            <span>or continue with</span>
-          </div>
-
-          <div className="social-buttons">
-            <button className="social-button google">
-              <span className="social-icon">🔍</span>
-              Google
-            </button>
-            <button className="social-button facebook">
-              <span className="social-icon">📘</span>
-              Facebook
-            </button>
-          </div>
+          <p>
+            Don't have an account? <Link to="/signup">Sign Up</Link>
+          </p>
         </div>
       </div>
     </div>
