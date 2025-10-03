@@ -21,14 +21,17 @@ const SignIn = () => {
   const [serverError, setServerError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
+ useEffect(() => {
   if (toast.show) {
+    // Error messages stay for 5 seconds, success messages for 3 seconds
+    const duration = toast.type === 'error' ? 5000 : 3000;
+    
     const timer = setTimeout(() => {
       setToast({ show: false, message: '', type: '' });
-    }, 4000);
+    }, duration);
     return () => clearTimeout(timer);
   }
-}, [toast.show]);
+}, [toast.show]);  // ⭐ ONLY toast.show - remove toast.type
   // Check if user already logged in on component mount
   useEffect(() => {
     const userId = localStorage.getItem("userId");
